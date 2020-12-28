@@ -30,11 +30,30 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
-  
+  // testImage: https://www.litter.me/wp/wp-content/uploads/2020/09/DJI_0094-scaled.jpg
+  app.get("/FilteredImage", async (req, res) => {
+      const sourceImageUrl = req.query.imageUrl;
+
+      if (!sourceImageUrl) {
+        res.status(404).send({status: "Error",message: "Please provide valid imnageUrl."});
+        return;
+      }
+      
+      var filteredImage = await filterImageFromURL(sourceImageUrl);
+
+      if (!filteredImage) {
+        res.status(500).send({status: "Error",message: "Image conversion failed."});
+        return;
+      }
+
+      res.sendFile(filteredImage);
+      res.on("finish", function() {deleteLocalFiles([filteredImage]);});
+  });
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
+    res.send("try GET /FilteredImage?imageUrl={{}}")
   } );
   
 
